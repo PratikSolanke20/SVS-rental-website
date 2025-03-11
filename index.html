@@ -3,117 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <h1>Sandip Solanke</h1>
     <title>Room Rental Management</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
             background-color: #121212;
-            color: #f1f1f1;
-            padding: 20px;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
         .container {
-            max-width: 600px;
+            width: 90%;
             margin: auto;
-        }
-        .room-form {
-            margin-bottom: 20px;
-            background-color: #1e1e1e;
             padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
-        input, select, button {
-            width: 100%;
+        h1 {
+            text-align: center;
+            color: #66fcf1;
+        }
+        .room {
+            background-color: #1f1f1f;
             padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        input, button {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
             border: none;
-            background-color: #333;
-            color: #f1f1f1;
+            border-radius: 5px;
+        }
+        input {
+            background-color: #2c2c2c;
+            color: #ffffff;
         }
         button {
-            background-color: #6200ea;
+            background-color: #66fcf1;
+            color: #000;
+            font-weight: bold;
             cursor: pointer;
         }
         button:hover {
-            background-color: #3700b3;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            background-color: #1e1e1e;
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            background-color: #45a29e;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Room Rental Management</h1>
-        <form id="rentalForm" class="room-form">
-            <select id="room" required>
-                <option value="" disabled selected>Select Room Number</option>
-                <option value="1">Room 1</option>
-                <option value="2">Room 2</option>
-                <option value="3">Room 3</option>
-                <option value="4">Room 4</option>
-                <option value="5">Room 5</option>
-                <option value="6">Room 6</option>
-                <option value="7">Room 7</option>
-                <option value="8">Room 8</option>
-            </select>
-            <input type="text" id="name" placeholder="Name of Rent Seeker" required>
-            <input type="number" id="payment" placeholder="Payment Amount" required>
-            <input type="date" id="paymentDate" required>
-            <button type="submit">Save</button>
-        </form>
-
-        <h2>Saved Records</h2>
-        <ul id="recordsList"></ul>
+        <div id="rooms"></div>
+        <button onclick="saveData()">Save Data</button>
     </div>
 
     <script>
-        document.getElementById('rentalForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const room = document.getElementById('room').value;
-            const name = document.getElementById('name').value;
-            const payment = document.getElementById('payment').value;
-            const paymentDate = document.getElementById('paymentDate').value;
+        const roomCount = 8;
+        const rooms = [];
 
-            const record = {
-                room: room,
-                name: name,
-                payment: payment,
-                paymentDate: paymentDate
-            };
-
-            let records = JSON.parse(localStorage.getItem('rentalRecords')) || [];
-            records.push(record);
-            localStorage.setItem('rentalRecords', JSON.stringify(records));
-
-            displayRecords();
-            this.reset();
-        });
-
-        function displayRecords() {
-            let records = JSON.parse(localStorage.getItem('rentalRecords')) || [];
-            const recordsList = document.getElementById('recordsList');
-            recordsList.innerHTML = '';
-
-            records.forEach(record => {
-                const listItem = document.createElement('li');
-                listItem.textContent = `Room: ${record.room}, Name: ${record.name}, Payment: ${record.payment}, Date: ${record.paymentDate}`;
-                recordsList.appendChild(listItem);
-            });
+        function loadRooms() {
+            const roomsDiv = document.getElementById('rooms');
+            roomsDiv.innerHTML = ''; // Clear previous content
+            for (let i = 1; i <= roomCount; i++) {
+                roomsDiv.innerHTML += `
+                    <div class="room">
+                        <h2>Room ${i}</h2>
+                        <label>Name of Rent Seeker:</label>
+                        <input type="text" id="room${i}name">
+                        <label>Rent Paid:</label>
+                        <input type="number" id="room${i}rent">
+                        <label>Light Units Consumed:</label>
+                        <input type="number" id="room${i}light">
+                        <label>Light Bill Payment:</label>
+                        <input type="number" id="room${i}lightbill">
+                        <label>Water Bill Payment:</label>
+                        <input type="number" id="room${i}waterbill">
+                        <label>Date of Payment:</label>
+                        <input type="date" id="room${i}date">
+                    </div>`;
+            }
         }
 
-        // Display saved records on page load
-        displayRecords();
+        function saveData() {
+            for (let i = 1; i <= roomCount; i++) {
+                const roomData = {
+                    name: document.getElementById(`room${i}name`).value,
+                    rent: document.getElementById(`room${i}rent`).value,
+                    light: document.getElementById(`room${i}light`).value,
+                    lightbill: document.getElementById(`room${i}lightbill`).value,
+                    waterbill: document.getElementById(`room${i}waterbill`).value,
+                    date: document.getElementById(`room${i}date`).value
+                };
+                rooms[i - 1] = roomData;
+            }
+            localStorage.setItem('rooms', JSON.stringify(rooms));
+            alert('Data saved successfully!');
+        }
+
+        function loadSavedData() {
+            const savedData = JSON.parse(localStorage.getItem('rooms'));
+            if (savedData) {
+                for (let i = 1; i <= roomCount; i++) {
+                    const roomData = savedData[i - 1];
+                    if (roomData) {
+                        document.getElementById(`room${i}name`).value = roomData.name || '';
+                        document.getElementById(`room${i}rent`).value = roomData.rent || '';
+                        document.getElementById(`room${i}light`).value = roomData.light || '';
+                        document.getElementById(`room${i}lightbill`).value = roomData.lightbill || '';
+                        document.getElementById(`room${i}waterbill`).value = roomData.waterbill || '';
+                        document.getElementById(`room${i}date`).value = roomData.date || '';
+                    }
+                }
+            }
+        }
+
+        // Initialize the website with saved data
+        loadRooms();
+        loadSavedData();
     </script>
 </body>
 </html>
