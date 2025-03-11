@@ -21,24 +21,26 @@
             text-align: center;
             color: #66fcf1;
         }
+        .dropdown {
+            margin-bottom: 20px;
+        }
         .room {
             background-color: #1f1f1f;
             padding: 10px;
-            margin-bottom: 20px;
             border-radius: 10px;
         }
         label {
             display: block;
             margin-bottom: 8px;
         }
-        input, button {
+        input, button, select {
             width: 100%;
             padding: 8px;
             margin-bottom: 10px;
             border: none;
             border-radius: 5px;
         }
-        input {
+        input, select {
             background-color: #2c2c2c;
             color: #ffffff;
         }
@@ -56,72 +58,89 @@
 <body>
     <div class="container">
         <h1>Room Rental Management</h1>
-        <div id="rooms"></div>
+        <div class="dropdown">
+            <label for="roomSelect">Select a Room:</label>
+            <select id="roomSelect" onchange="displayRoom()">
+                <option value="">-- Select Room --</option>
+            </select>
+        </div>
+        <div id="roomDetails" class="room" style="display: none;">
+            <label>Name of Rent Seeker:</label>
+            <input type="text" id="roomName">
+            <label>Rent Paid:</label>
+            <input type="number" id="roomRent">
+            <label>Light Units Consumed:</label>
+            <input type="number" id="roomLight">
+            <label>Light Bill Payment:</label>
+            <input type="number" id="roomLightBill">
+            <label>Water Bill Payment:</label>
+            <input type="number" id="roomWaterBill">
+            <label>Date of Payment:</label>
+            <input type="date" id="roomDate">
+        </div>
         <button onclick="saveData()">Save Data</button>
     </div>
 
     <script>
         const roomCount = 8;
-        const rooms = [];
+        const rooms = Array(roomCount).fill(null).map(() => ({}));
 
-        function loadRooms() {
-            const roomsDiv = document.getElementById('rooms');
-            roomsDiv.innerHTML = ''; // Clear previous content
+        function initializeDropdown() {
+            const roomSelect = document.getElementById('roomSelect');
             for (let i = 1; i <= roomCount; i++) {
-                roomsDiv.innerHTML += `
-                    <div class="room">
-                        <h2>Room ${i}</h2>
-                        <label>Name of Rent Seeker:</label>
-                        <input type="text" id="room${i}name">
-                        <label>Rent Paid:</label>
-                        <input type="number" id="room${i}rent">
-                        <label>Light Units Consumed:</label>
-                        <input type="number" id="room${i}light">
-                        <label>Light Bill Payment:</label>
-                        <input type="number" id="room${i}lightbill">
-                        <label>Water Bill Payment:</label>
-                        <input type="number" id="room${i}waterbill">
-                        <label>Date of Payment:</label>
-                        <input type="date" id="room${i}date">
-                    </div>`;
+                const option = document.createElement('option');
+                option.value = i;
+                option.text = `Room ${i}`;
+                roomSelect.add(option);
+            }
+        }
+
+        function displayRoom() {
+            const roomIndex = document.getElementById('roomSelect').value - 1;
+            const roomDetails = document.getElementById('roomDetails');
+            if (roomIndex >= 0) {
+                const roomData = rooms[roomIndex];
+                document.getElementById('roomName').value = roomData.name || '';
+                document.getElementById('roomRent').value = roomData.rent || '';
+                document.getElementById('roomLight').value = roomData.light || '';
+                document.getElementById('roomLightBill').value = roomData.lightbill || '';
+                document.getElementById('roomWaterBill').value = roomData.waterbill || '';
+                document.getElementById('roomDate').value = roomData.date || '';
+                roomDetails.style.display = 'block';
+            } else {
+                roomDetails.style.display = 'none';
             }
         }
 
         function saveData() {
-            for (let i = 1; i <= roomCount; i++) {
-                const roomData = {
-                    name: document.getElementById(`room${i}name`).value,
-                    rent: document.getElementById(`room${i}rent`).value,
-                    light: document.getElementById(`room${i}light`).value,
-                    lightbill: document.getElementById(`room${i}lightbill`).value,
-                    waterbill: document.getElementById(`room${i}waterbill`).value,
-                    date: document.getElementById(`room${i}date`).value
+            const roomIndex = document.getElementById('roomSelect').value - 1;
+            if (roomIndex >= 0) {
+                rooms[roomIndex] = {
+                    name: document.getElementById('roomName').value,
+                    rent: document.getElementById('roomRent').value,
+                    light: document.getElementById('roomLight').value,
+                    lightbill: document.getElementById('roomLightBill').value,
+                    waterbill: document.getElementById('roomWaterBill').value,
+                    date: document.getElementById('roomDate').value
                 };
-                rooms[i - 1] = roomData;
+                localStorage.setItem('rooms', JSON.stringify(rooms));
+                alert(`Data for Room ${roomIndex + 1} saved successfully!`);
+            } else {
+                alert('Please select a room first.');
             }
-            localStorage.setItem('rooms', JSON.stringify(rooms));
-            alert('Data saved successfully!');
         }
 
         function loadSavedData() {
             const savedData = JSON.parse(localStorage.getItem('rooms'));
             if (savedData) {
-                for (let i = 1; i <= roomCount; i++) {
-                    const roomData = savedData[i - 1];
-                    if (roomData) {
-                        document.getElementById(`room${i}name`).value = roomData.name || '';
-                        document.getElementById(`room${i}rent`).value = roomData.rent || '';
-                        document.getElementById(`room${i}light`).value = roomData.light || '';
-                        document.getElementById(`room${i}lightbill`).value = roomData.lightbill || '';
-                        document.getElementById(`room${i}waterbill`).value = roomData.waterbill || '';
-                        document.getElementById(`room${i}date`).value = roomData.date || '';
-                    }
+                for (let i = 0; i < roomCount; i++) {
+                    rooms[i] = savedData[i] || {};
                 }
             }
         }
 
         // Initialize the website with saved data
-        loadRooms();
+        initializeDropdown();
         loadSavedData();
     </script>
 </body>
