@@ -3,88 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rental Management</title>
+    <title>Room Rental Management</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
             margin: 20px;
         }
-        table {
-            border-collapse: collapse;
+        h1 {
+            text-align: center;
+            color: #00bcd4;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        input, select, button {
             width: 100%;
-            margin-bottom: 20px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
+        input, select {
+            background-color: #333;
+            color: #fff;
         }
         button {
-            padding: 8px 12px;
-            font-size: 16px;
+            background-color: #00bcd4;
+            color: #000;
+            font-weight: bold;
             cursor: pointer;
+        }
+        button:hover {
+            background-color: #008c9e;
+        }
+        .result {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <h1>Rental Management System</h1>
-    <table id="rentalData">
-        <thead>
-            <tr>
-                <th>Room</th>
-                <th>Name</th>
-                <th>Rent Payment</th>
-                <th>Light Bill Units</th>
-                <th>Light Bill Payment</th>
-                <th>Water Bill Payment</th>
-                <th>Payment Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data rows will be added here -->
-        </tbody>
-    </table>
-    <button onclick="addData()">Add New Record</button>
+    <h1>Room Rental Management</h1>
+    <div class="container">
+        <label for="roomNumber">Room Number:</label>
+        <select id="roomNumber">
+            <option value="1">Room 1</option>
+            <option value="2">Room 2</option>
+            <option value="3">Room 3</option>
+            <option value="4">Room 4</option>
+            <option value="5">Room 5</option>
+            <option value="6">Room 6</option>
+            <option value="7">Room 7</option>
+            <option value="8">Room 8</option>
+        </select>
+
+        <label for="name">Rent Seeker Name:</label>
+        <input type="text" id="name" placeholder="Enter name">
+
+        <label for="rentCost">Room Rent Cost:</label>
+        <input type="number" id="rentCost" placeholder="Enter rent cost">
+
+        <label for="lightCost">Light Bill Cost:</label>
+        <input type="number" id="lightCost" placeholder="Enter light bill cost">
+
+        <label for="waterCost">Water Bill Cost:</label>
+        <input type="number" id="waterCost" placeholder="Enter water bill cost">
+
+        <button onclick="calculateTotal()">Calculate Total</button>
+
+        <div class="result" id="result">
+            Total Cost: ₹0.00
+        </div>
+    </div>
 
     <script>
-        const rentalData = JSON.parse(localStorage.getItem('rentalData')) || [];
+        function calculateTotal() {
+            const rentCost = parseFloat(document.getElementById("rentCost").value) || 0;
+            const lightCost = parseFloat(document.getElementById("lightCost").value) || 0;
+            const waterCost = parseFloat(document.getElementById("waterCost").value) || 0;
 
-        function renderTable() {
-            const tableBody = document.querySelector("#rentalData tbody");
-            tableBody.innerHTML = "";
+            const totalCost = rentCost + lightCost + waterCost;
 
-            rentalData.forEach((entry, index) => {
-                const row = document.createElement("tr");
-
-                Object.values(entry).forEach(value => {
-                    const cell = document.createElement("td");
-                    cell.textContent = value;
-                    row.appendChild(cell);
-                });
-
-                tableBody.appendChild(row);
-            });
+            document.getElementById("result").innerText = `Total Cost: ₹${totalCost.toFixed(2)}`;
         }
-
-        function addData() {
-            const room = prompt("Enter Room Number:");
-            const name = prompt("Enter Name:");
-            const rent = prompt("Enter Rent Payment:");
-            const units = prompt("Enter Light Bill Units:");
-            const lightBill = prompt("Enter Light Bill Payment:");
-            const waterBill = prompt("Enter Water Bill Payment:");
-            const date = prompt("Enter Payment Date (YYYY-MM-DD):");
-
-            rentalData.push({ room, name, rent, units, lightBill, waterBill, date });
-            localStorage.setItem('rentalData', JSON.stringify(rentalData));
-            renderTable();
-        }
-
-        // Render the table on page load
-        renderTable();
     </script>
 </body>
 </html>
